@@ -1,0 +1,36 @@
+<IfModule mod_rewrite.c>
+
+    # Make sure directory listing is disabled
+    Options +FollowSymLinks -Indexes
+    RewriteEngine on
+
+    # NOTICE: If you get a 404 play with combinations of the following commented out lines
+    #AllowOverride All
+    #RewriteBase /wherever/ci/is
+    RewriteBase /
+
+    # Send request via index.php (again, not if its a real file or folder)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    RewriteCond $1 ^(robots\.txt|favicon\.ico|style\.css)
+
+    # deal with php5-cgi first
+    <IfModule mod_fcgid.c>
+        RewriteRule ^(.*)$ index.php?/$1 [QSA,L]
+    </IfModule>
+
+    <IfModule !mod_fcgid.c>
+
+        # for normal Apache installations
+        <IfModule mod_php5.c>
+            RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+        </IfModule>
+
+        # for Apache FCGI installations
+        <IfModule !mod_php5.c>
+            RewriteRule ^(.*)$ index.php?/$1 [QSA,L]
+        </IfModule>
+
+    </IfModule>
+</IfModule>
